@@ -2,10 +2,10 @@
 function handler () {
     EVENT_DATA=$1
    #PASS_THE_ROLE_ARN
-RoleARN=( 'arn:aws:iam::128342401125:role/impaired-instances-scanner-role' 'arn:aws:iam::521870984084:role/Lambda-role-detect-impaired-instances' )
+RoleARN=( '' '' )
 
 #to switch role and send ses mail .
-OUT2=$(aws sts assume-role --role-arn 'arn:aws:iam::521870984084:role/Lambda-role-detect-impaired-instances' --role-session-name aaa )
+OUT2=$(aws sts assume-role --role-arn '' --role-session-name aaa )
 
 for  i in "${RoleARN[@]}";do 
 
@@ -68,7 +68,7 @@ done
 
 sample_data="$(cat /tmp/sample.txt )"
 #sending mail via SES
-aws ses send-email --from  mailto:srikanth.reddy@8x8.com --to mailto:srikanth.reddy@8x8.com --text "$sample_data " --subject "List of Impaired instances of account"
+aws ses send-email --from  "" --to "" --text "$sample_data " --subject "List of Impaired instances of account"
 
 }
 
