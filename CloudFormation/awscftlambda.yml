@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template to Create an IAM Role for lambda'
+
+Parameters:
+  Sechduletimeexpression:
+    Type: String
+    Default: rate(5 minutes)
+  
+  assumepolicyarn:
+    Type: String
+  
+
+#Created Lambda trut policy &  and assign policys to role 
+Resources:
+
+  
+  assumepolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      # PolicyName: Assumepolicyuser      
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action: "sts:AssumeRole"
+          Resource: !Ref assumepolicyarn
+       
+  lambdatestrole01:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "LambdaRolefortest01" 
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole' 
+
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonEC2FullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonSESFullAccess'
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - !Ref assumepolicy
+
+
+#Create a Lambda function with properites 
+  lambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 'Creating lambda function'
+      FunctionName: 'lambdatesting01'
+      Handler: hello.handler  
+      MemorySize: 512
+      Role: !GetAtt lambdatestrole01.Arn 
+      Runtime: provided
+      Timeout: 300
+      Code: 
+        S3Bucket: awslambda00001
+        S3Key: function.zip
+      Layers:
+      - arn:aws:lambda:us-east-1:744348701589:layer:bash:8
+    DependsOn: lambdatestrole01
+
